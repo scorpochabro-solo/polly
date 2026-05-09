@@ -1,0 +1,22 @@
+{
+  "name": "Jungle Marketing",
+  "short_name": "Jungle",
+  "description": "Digital marketing agency in Porto: paid ads, SMM, websites, content and analytics.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#07100c",
+  "theme_color": "#07100c",
+  "icons": [
+    {
+      "src": "./favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
