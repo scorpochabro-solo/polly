@@ -1,7 +1,7 @@
 {
   "name": "Jungle Marketing",
   "short_name": "Jungle",
-  "description": "Digital marketing agency in Porto: paid ads, SMM, websites, content and analytics.",
+  "description": "Online digital marketing agency: paid ads, SMM, websites, content and analytics.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

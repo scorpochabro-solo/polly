@@ -2,5 +2,5 @@
 .playwright-mcp/
 tmp/
 output/
-social-preview.png
-assets/hero-porto-system.png
+/social-preview.png
+assets/hero-draft.png
