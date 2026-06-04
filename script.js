@@ -1,8 +1,9 @@
-// Navigation, anchored scrolling, reveal animation and desktop-only parallax.
+// Navigation, anchored scrolling, scroll-spy, reveal animation and desktop-only parallax.
 const header = document.querySelector("[data-header]");
 const menuToggle = document.querySelector("[data-menu-toggle]");
 const menu = document.querySelector("[data-menu]");
 const scrollLinks = document.querySelectorAll("[data-scroll]");
+const navLinks = document.querySelectorAll(".site-nav a[href^='#']");
 const revealItems = document.querySelectorAll(".reveal");
 const parallaxItems = document.querySelectorAll("[data-parallax]");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -68,6 +69,36 @@ document.addEventListener("click", (event) => {
   closeMenu();
 });
 
+// Scroll-spy: highlight the nav link for the section currently in view.
+if (navLinks.length && "IntersectionObserver" in window) {
+  const sections = [];
+  navLinks.forEach((link) => {
+    const section = document.querySelector(link.getAttribute("href"));
+    if (section) sections.push({ link, section });
+  });
+
+  const setActive = (id) => {
+    navLinks.forEach((link) => {
+      link.classList.toggle("is-active", link.getAttribute("href") === `#${id}`);
+    });
+  };
+
+  const spy = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    },
+    {
+      rootMargin: "-45% 0px -50% 0px",
+      threshold: 0,
+    }
+  );
+
+  sections.forEach(({ section }) => spy.observe(section));
+}
+
+// Reveal-on-scroll.
 if ("IntersectionObserver" in window && !reduceMotion.matches) {
   const revealIfNearViewport = () => {
     revealItems.forEach((item) => {
@@ -119,6 +150,7 @@ if ("IntersectionObserver" in window && !reduceMotion.matches) {
   revealItems.forEach((item) => item.classList.add("is-visible"));
 }
 
+// Desktop-only hero parallax.
 if (parallaxItems.length && !reduceMotion.matches && desktopPointer.matches) {
   const hero = document.querySelector(".hero");
 
