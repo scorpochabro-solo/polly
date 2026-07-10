@@ -1,179 +1,205 @@
-// Navigation, anchored scrolling, scroll-spy, reveal animation and desktop-only parallax.
+document.documentElement.classList.add("js");
+
 const header = document.querySelector("[data-header]");
 const menuToggle = document.querySelector("[data-menu-toggle]");
 const menu = document.querySelector("[data-menu]");
+const main = document.querySelector("main");
+const footer = document.querySelector("footer");
 const scrollLinks = document.querySelectorAll("[data-scroll]");
-const navLinks = document.querySelectorAll(".site-nav a[href^='#']");
-const revealItems = document.querySelectorAll(".reveal");
-const parallaxItems = document.querySelectorAll("[data-parallax]");
+const navLinks = document.querySelectorAll(".site-nav > a[href^='#']:not(.button)");
+const revealItems = document.querySelectorAll("[data-reveal]");
+const drawItems = document.querySelectorAll("[data-draw]");
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-const desktopPointer = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 900px)");
+const mobileLayout = window.matchMedia("(max-width: 900px)");
 
-const closeMenu = () => {
+let menuIsOpen = false;
+let menuFocusTimer;
+
+const setPageInert = (isInert) => {
+  if (main) main.inert = isInert;
+  if (footer) footer.inert = isInert;
+};
+
+const getFocusableMenuItems = () => {
+  if (!header) return [];
+
+  return Array.from(header.querySelectorAll("a[href], button:not([disabled])")).filter(
+    (element) => element.getClientRects().length > 0
+  );
+};
+
+const closeMenu = ({ restoreFocus = false } = {}) => {
   if (!header || !menuToggle) return;
 
+  menuIsOpen = false;
   header.classList.remove("is-open");
   document.body.classList.remove("menu-open");
   menuToggle.setAttribute("aria-expanded", "false");
   menuToggle.setAttribute("aria-label", "Open menu");
+  setPageInert(false);
+  window.clearTimeout(menuFocusTimer);
+
+  if (restoreFocus && mobileLayout.matches) menuToggle.focus();
 };
 
-if (menuToggle) {
-  menuToggle.addEventListener("click", () => {
-    const isOpen = header.classList.toggle("is-open");
-    document.body.classList.toggle("menu-open", isOpen);
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
-    menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
-  });
-}
+const openMenu = () => {
+  if (!header || !menuToggle || !menu || !mobileLayout.matches) return;
+
+  menuIsOpen = true;
+  header.classList.add("is-open");
+  document.body.classList.add("menu-open");
+  menuToggle.setAttribute("aria-expanded", "true");
+  menuToggle.setAttribute("aria-label", "Close menu");
+  setPageInert(true);
+
+  const firstMenuLink = menu.querySelector("a[href]");
+  menuFocusTimer = window.setTimeout(() => {
+    if (menuIsOpen) firstMenuLink?.focus();
+  }, 240);
+};
+
+menuToggle?.addEventListener("click", () => {
+  if (menuIsOpen) {
+    closeMenu({ restoreFocus: true });
+  } else {
+    openMenu();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (!menuIsOpen) return;
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeMenu({ restoreFocus: true });
+    return;
+  }
+
+  if (event.key !== "Tab") return;
+
+  const focusable = getFocusableMenuItems();
+  if (!focusable.length) return;
+
+  const firstItem = focusable[0];
+  const lastItem = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === firstItem) {
+    event.preventDefault();
+    lastItem.focus();
+  } else if (!event.shiftKey && document.activeElement === lastItem) {
+    event.preventDefault();
+    firstItem.focus();
+  }
+});
+
+mobileLayout.addEventListener("change", (event) => {
+  if (!event.matches) closeMenu();
+});
 
 scrollLinks.forEach((link) => {
   link.addEventListener("click", (event) => {
     const targetId = link.getAttribute("href");
-
-    if (!targetId || !targetId.startsWith("#")) return;
+    if (!targetId?.startsWith("#")) return;
 
     const target = document.querySelector(targetId);
     if (!target) return;
 
     event.preventDefault();
+    closeMenu();
 
-    const offset = header ? header.offsetHeight + 8 : 0;
-    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    const headerOffset = header ? header.offsetHeight + 10 : 0;
+    const targetTop = targetId === "#top" ? 0 : target.getBoundingClientRect().top + window.scrollY - headerOffset;
 
     window.scrollTo({
-      top,
+      top: Math.max(0, targetTop),
       behavior: reduceMotion.matches ? "auto" : "smooth",
     });
-
-    closeMenu();
   });
 });
+
+let scrollTicking = false;
+
+const updateHeader = () => {
+  header?.classList.toggle("is-scrolled", window.scrollY > 18);
+  scrollTicking = false;
+};
 
 window.addEventListener(
   "scroll",
   () => {
-    if (!header) return;
-    header.classList.toggle("is-scrolled", window.scrollY > 20);
+    if (scrollTicking) return;
+    scrollTicking = true;
+    window.requestAnimationFrame(updateHeader);
   },
   { passive: true }
 );
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeMenu();
-});
+updateHeader();
 
-document.addEventListener("click", (event) => {
-  if (!header || !menu || !header.classList.contains("is-open")) return;
-  if (header.contains(event.target)) return;
-  closeMenu();
-});
-
-// Scroll-spy: highlight the nav link for the section currently in view.
-if (navLinks.length && "IntersectionObserver" in window) {
-  const sections = [];
-  navLinks.forEach((link) => {
-    const section = document.querySelector(link.getAttribute("href"));
-    if (section) sections.push({ link, section });
-  });
-
-  const setActive = (id) => {
-    navLinks.forEach((link) => {
-      link.classList.toggle("is-active", link.getAttribute("href") === `#${id}`);
-    });
-  };
-
-  const spy = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) setActive(entry.target.id);
-      });
-    },
-    {
-      rootMargin: "-45% 0px -50% 0px",
-      threshold: 0,
-    }
-  );
-
-  sections.forEach(({ section }) => spy.observe(section));
-}
-
-// Reveal-on-scroll.
-if ("IntersectionObserver" in window && !reduceMotion.matches) {
-  const revealIfNearViewport = () => {
-    revealItems.forEach((item) => {
-      if (item.classList.contains("is-visible")) return;
-
-      const rect = item.getBoundingClientRect();
-      if (rect.top < window.innerHeight + 260 && rect.bottom > -260) {
-        item.classList.add("is-visible");
-      }
-    });
-  };
-
+if (reduceMotion.matches || !("IntersectionObserver" in window)) {
+  revealItems.forEach((item) => item.classList.add("is-visible"));
+  drawItems.forEach((item) => item.classList.add("is-drawn"));
+} else {
   const revealObserver = new IntersectionObserver(
     (entries, observer) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-
         entry.target.classList.add("is-visible");
         observer.unobserve(entry.target);
       });
     },
-    {
-      threshold: 0.01,
-      rootMargin: "240px 0px 240px 0px",
-    }
+    { threshold: 0.08, rootMargin: "0px 0px -8% 0px" }
   );
 
   revealItems.forEach((item, index) => {
-    item.style.setProperty("--reveal-delay", `${Math.min(index % 6, 5) * 55}ms`);
+    item.style.setProperty("--reveal-delay", `${(index % 4) * 55}ms`);
     revealObserver.observe(item);
   });
 
-  let revealTicking = false;
-  window.addEventListener(
-    "scroll",
-    () => {
-      if (revealTicking) return;
-      revealTicking = true;
-      window.requestAnimationFrame(() => {
-        revealIfNearViewport();
-        revealTicking = false;
+  const drawObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-drawn");
+        observer.unobserve(entry.target);
       });
     },
-    { passive: true }
+    { threshold: 0.22 }
   );
 
-  revealIfNearViewport();
-} else {
-  revealItems.forEach((item) => item.classList.add("is-visible"));
+  drawItems.forEach((item) => drawObserver.observe(item));
 }
 
-// Desktop-only hero parallax.
-if (parallaxItems.length && !reduceMotion.matches && desktopPointer.matches) {
-  const hero = document.querySelector(".hero");
+if (navLinks.length && "IntersectionObserver" in window) {
+  const observedSections = Array.from(navLinks)
+    .map((link) => {
+      const section = document.querySelector(link.getAttribute("href"));
+      return section ? { link, section } : null;
+    })
+    .filter(Boolean);
 
-  if (hero) {
-    hero.addEventListener(
-      "pointermove",
-      (event) => {
-        const rect = hero.getBoundingClientRect();
-        const x = (event.clientX - rect.left) / rect.width - 0.5;
-        const y = (event.clientY - rect.top) / rect.height - 0.5;
-
-        parallaxItems.forEach((item, index) => {
-          const depth = 10 + index * 5;
-          item.style.transform = `translate3d(${x * depth}px, ${y * depth}px, 0)`;
-        });
-      },
-      { passive: true }
-    );
-
-    hero.addEventListener("pointerleave", () => {
-      parallaxItems.forEach((item) => {
-        item.style.transform = "translate3d(0, 0, 0)";
-      });
+  const setCurrentSection = (sectionId) => {
+    navLinks.forEach((link) => {
+      if (link.getAttribute("href") === `#${sectionId}`) {
+        link.setAttribute("aria-current", "true");
+      } else {
+        link.removeAttribute("aria-current");
+      }
     });
-  }
+  };
+
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      const visibleEntry = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (visibleEntry) setCurrentSection(visibleEntry.target.id);
+    },
+    { rootMargin: "-28% 0px -58% 0px", threshold: [0, 0.1, 0.25] }
+  );
+
+  observedSections.forEach(({ section }) => sectionObserver.observe(section));
 }
+
+window.requestAnimationFrame(() => document.body.classList.add("is-ready"));

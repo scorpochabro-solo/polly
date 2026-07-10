@@ -1,28 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Jungle Marketing">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#a8af78" />
-      <stop offset="100%" stop-color="#5d6945" />
-    </linearGradient>
-    <radialGradient id="glow" cx="30%" cy="28%" r="70%">
-      <stop offset="0%" stop-color="#f5f1e8" stop-opacity="0.32" />
-      <stop offset="100%" stop-color="#f5f1e8" stop-opacity="0" />
-    </radialGradient>
-  </defs>
-  <rect width="512" height="512" rx="144" fill="#0b0e0d" />
-  <rect x="40" y="40" width="432" height="432" rx="120" fill="url(#bg)" />
-  <rect x="40" y="40" width="432" height="432" rx="120" fill="url(#glow)" />
-  <text
-    x="50%"
-    y="54%"
-    text-anchor="middle"
-    dominant-baseline="middle"
-    fill="#f5f1e8"
-    font-family="Cormorant Garamond, Georgia, serif"
-    font-size="182"
-    font-weight="700"
-    letter-spacing="10"
-  >
-    JM
-  </text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="13" fill="#123F2D" />
+  <path fill="#D4F84F" d="M7 8h19v29c0 12-6 19-17 19-3 0-5.5-.6-8-2l3.8-7.1c1.2.8 2.7 1.1 4.2 1.1 5.7 0 8.5-3.4 8.5-10.2V16H7V8Zm26 48V8h8l7 16.2L55 8h8v48h-8.3V27L48 42.3 41.4 27v29H33Z" />
+  <path fill="none" stroke="#FF6845" stroke-linecap="round" stroke-width="3" d="M21 24c2-8 7-12 14-12" />
+  <circle cx="36" cy="12" r="3.5" fill="#FF6845" />
 </svg>
