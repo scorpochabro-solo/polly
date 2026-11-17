@@ -16,7 +16,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="preload" href="assets/barlow-condensed-bold.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="assets/jaguar.webp" as="image" type="image/webp">
+  <link rel="preload" href="assets/focus.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="edition.css">
   <script src="edition.js" defer></script>
 </head>
@@ -30,14 +30,13 @@
     </div>
   </header>
   <main id="main">
-    <!-- Masthead and independently moving photographic cutout -->
+    <!-- Masthead and independently moving mascot -->
     <section class="cover" aria-labelledby="mast">
       <div class="wrap cover-inner">
-        <div class="cover-meta micro"><span><i class="dot"></i> Digital marketing studio</span><span>Studio edition / 2027</span></div>
         <div class="poster">
           <div class="orbit" aria-hidden="true"></div>
           <h1 id="mast"><span class="mast-word">Jungle</span><span class="mast-script">Marketing</span></h1>
-          <div class="animal" aria-hidden="true"><img class="cat" src="assets/jaguar.webp" width="924" height="950" alt="" fetchpriority="high"></div>
+          <div class="animal"><img class="cat" src="assets/focus.webp" width="1000" height="1000" alt="Focus, the studio jaguar, framing a shot." fetchpriority="high"></div>
           <div class="cover-copy">
             <p>We make ads, content and websites for the people you want to reach.</p>
             <a class="button" href="#services">Explore services <span aria-hidden="true">↓</span></a>
@@ -55,14 +54,17 @@
         <div class="service-art">
           <p class="micro cap">Services</p>
           <h2 id="service-title">What we<br><em>do.</em></h2>
-          <img class="flower" src="assets/anthurium.webp" width="420" height="722" alt="" loading="lazy" decoding="async">
+          <div class="echo-stage">
+            <span class="sound-wave" aria-hidden="true"></span>
+            <img class="echo" src="assets/echo.webp" width="1000" height="1000" alt="Echo, a toucan with a megaphone beak." loading="lazy" decoding="async">
+          </div>
         </div>
         <div class="catalog">
           <details open><summary>Paid social</summary><p>Reach people on Facebook, Instagram and VK. We plan campaigns around the action you need, from a first message to a sales enquiry.</p></details>
           <details><summary>Social media management</summary><p>We plan posts, manage your accounts and shape the look of your profile so visitors can see what you offer.</p></details>
           <details><summary>Content production</summary><p>Portraits, product photography and event coverage for websites, social feeds and advertising.</p></details>
           <details><summary>Website design</summary><p>A one-page introduction or a multi-page website that helps visitors explore your offer and get in touch.</p></details>
-          <details><summary>Analytics &amp; audits</summary><p>We review your website, traffic and audience needs. That can include a Yandex Metrica review, product and persona maps, or a marketing kit.</p></details>
+          <details><summary>Analytics &amp; audits</summary><p id="audit-scope" tabindex="-1">We review your website, traffic and audience needs. That can include a Yandex Metrica review, product and persona maps, or a marketing kit.</p></details>
           <details><summary>Reels &amp; art direction</summary><p>Short-form video editing, reel covers and highlight artwork, with a visual direction for the whole profile.</p></details>
         </div>
       </div>
@@ -91,7 +93,14 @@
 
     <section class="process block" id="process" aria-labelledby="process-title">
       <div class="wrap process-layout">
-        <header><p class="micro cap">Our process</p><h2 id="process-title">From brief<br>to <em>launch.</em></h2></header>
+        <header class="process-intro">
+          <p class="micro cap">Our process</p>
+          <h2 id="process-title">From brief<br>to <em>launch.</em></h2>
+          <a class="prism-study" href="#audit-scope">
+            <img src="assets/prism.webp" width="1000" height="1000" alt="" loading="lazy" decoding="async">
+            <span>Explore the audit <b aria-hidden="true">↗</b></span>
+          </a>
+        </header>
         <ol class="steps">
           <li><h3>Understand the audience</h3><p>Map customer needs and the product. Review competitors to see which questions the offer needs to answer.</p></li>
           <li><h3>Shape the offer</h3><p>Clarify the service and prepare the website, social profile or messaging channel where enquiries will arrive.</p></li>
