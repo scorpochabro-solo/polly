@@ -26,88 +26,76 @@ reduced.addEventListener("change", syncMotion);
 syncMotion();
 
 function setupCameraShot() {
-  const canvas = portrait.querySelector("canvas");
-  const brush = canvas?.getContext("2d");
-  const still = portrait.querySelector("img");
+  const video = portrait.querySelector("video");
   const trigger = document.querySelector(".take-photo");
-  if (!brush || !("IntersectionObserver" in window)) return () => {};
+  if (!video || !("IntersectionObserver" in window)) return () => {};
 
-  // Sixteen upper-body cels share the unchanged legs in the original portrait.
-  const cols = 4, width = 384, height = 448;
-  let atlas, loading, timer, raf, pending = false, onScreen = false;
-  let played = false, requested = false, failed = false, generation = 0;
-  const allowed = () => root.hasAttribute("data-moving") && !failed;
+  // Safari supports alpha via HEVC; Chromium/Firefox use the VP9 alpha track.
+  const clip = matchMedia("(max-width: 580px)").matches ? "assets/camera-gesture-compact" : "assets/camera-gesture";
+  const sources = [
+    ["video/quicktime; codecs=hvc1", clip + ".mov"],
+    ["video/webm; codecs=vp9", clip + ".webm"]
+  ].filter(([type]) => video.canPlayType(type));
+  let source = 0, verified = false, onScreen = false, pending = false;
+  let attempted = false, requested = false, generation = 0, timer;
+  const allowed = () => root.hasAttribute("data-moving") && source < sources.length;
   const visible = () => allowed() && onScreen && !document.hidden;
-  const settle = x => x * x * (3 - 2 * x);
 
   function reset() {
     ++generation;
     clearTimeout(timer);
-    cancelAnimationFrame(raf);
+    video.pause();
     portrait.removeAttribute("data-shooting");
     trigger.removeAttribute("aria-disabled");
     pending = false;
   }
 
-  function glint(strength) {
-    // A single reflection on the lens, not a screen flash.
-    brush.save();
-    brush.translate(159,116);
-    brush.scale(strength,strength);
-    brush.fillStyle = "#fffbe0";
-    brush.beginPath();
-    for (const [x,y] of [[0,-9],[1.8,-2],[7,0],[1.8,1.6],[0,8],[-1.8,1.6],[-7,0],[-1.8,-2]]) brush.lineTo(x,y);
-    brush.closePath();
-    brush.fill();
-    brush.restore();
+  function hasAlpha() {
+    // Some decoders advertise the codec but display its transparent area black.
+    // Check one background pixel on first playback, never in the animation loop.
+    try {
+      const ctx = document.createElement("canvas").getContext("2d");
+      if (!ctx) return true;
+      ctx.drawImage(video, 0, 0, 16, 16, 0, 0, 1, 1);
+      return ctx.getImageData(0, 0, 1, 1).data[3] < 32;
+    } catch {
+      // Local file previews may play normally but forbid pixel reads.
+      return true;
+    }
   }
 
   async function shoot() {
     if (!visible() || pending) return;
     clearTimeout(timer);
+    attempted = pending = true;
     const run = ++generation;
-    pending = true;
-    trigger.setAttribute("aria-disabled","true");
-    if (!loading) {
-      atlas = new Image();
-      atlas.src = "assets/polina-shot.webp";
-      loading = Promise.all([atlas.decode(), still.decode()]);
-    }
-    try {
-      await loading;
-    } catch {
-      failed = true;
-      reset();
-      trigger.hidden = true;
-      return;
-    }
-    if (run !== generation || !visible()) return;
-    played = true;
-    brush.clearRect(0,0,canvas.width,canvas.height);
-    brush.drawImage(still,0,0,canvas.width,canvas.height);
-    let start, last = -1, lastSpark = -1;
-    function draw(now) {
-      start ??= now;
-      const ms = now - start;
-      if (ms >= 1800) { reset(); return; }
-      const lift = ms < 650 ? settle(ms/650) : ms < 1060 ? 1 : 1-settle((ms-1060)/740);
-      const cel = Math.round(lift * 16) - 1;
-      const spark = Math.max(0,1-Math.abs(ms-860)/82);
-      if (cel !== last || spark !== lastSpark) {
-        if (cel < 0) {
-          portrait.removeAttribute("data-shooting");
-        } else {
-          brush.clearRect(0,0,width,height);
-          brush.drawImage(atlas,(cel%cols)*width,Math.floor(cel/cols)*height,width,height,0,0,width,height);
-          if (spark > 0) glint(spark);
-          portrait.setAttribute("data-shooting","");
+    trigger.setAttribute("aria-disabled", "true");
+    while (run === generation && visible()) {
+      if (video.getAttribute("src") !== sources[source][1]) video.src = sources[source][1];
+      else if (video.readyState && video.currentTime) video.currentTime = 0;
+      try {
+        await video.play();
+        if (run !== generation) return;
+        if (verified || hasAlpha()) {
+          verified = true;
+          portrait.setAttribute("data-shooting", "");
+          return;
         }
-        last = cel;
-        lastSpark = spark;
+      } catch (error) {
+        if (run !== generation) return;
+        if (error.name === "NotAllowedError" || error.name === "AbortError") {
+          reset(); // Leave the manual action available when autoplay is blocked.
+          return;
+        }
       }
-      raf = requestAnimationFrame(draw);
+      video.pause();
+      verified = false;
+      ++source;
     }
-    raf = requestAnimationFrame(draw);
+    if (run === generation) {
+      reset();
+      trigger.hidden = !allowed();
+    }
   }
 
   function sync() {
@@ -118,23 +106,34 @@ function setupCameraShot() {
     if (requested) {
       requested = false;
       shoot();
-      return;
+    } else if (!attempted && !pending && !navigator.connection?.saveData) {
+      timer = setTimeout(shoot, 550);
     }
-    if (!played && !pending && !navigator.connection?.saveData) timer = setTimeout(shoot,550);
   }
-  trigger.addEventListener("click",() => {
+  video.addEventListener("ended", reset);
+  video.addEventListener("error", () => {
+    // Errors during startup are handled by play(); a late decode failure must
+    // also restore the accessible portrait rather than leave a frozen frame.
+    if (portrait.hasAttribute("data-shooting")) {
+      ++source;
+      verified = false;
+      reset();
+      sync();
+    }
+  });
+  trigger.addEventListener("click", () => {
     if (!allowed() || pending) return;
     if (onScreen) shoot();
     else {
       requested = true;
-      portrait.scrollIntoView({block:"center",behavior:"instant"});
+      portrait.scrollIntoView({block: "center", behavior: "instant"});
     }
   });
-  document.addEventListener("visibilitychange",sync);
+  document.addEventListener("visibilitychange", sync);
   const observer = new IntersectionObserver(([entry]) => {
     onScreen = entry.isIntersecting && entry.intersectionRatio >= .3;
     sync();
-  }, {threshold:[0,.3]});
+  }, {threshold: [0, .3]});
   observer.observe(portrait);
   return sync;
 }

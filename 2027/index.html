@@ -18,8 +18,8 @@
   <link rel="preload" href="assets/barlow-condensed-bold.ttf" as="font" type="font/ttf" crossorigin>
   <meta property="og:image:alt" content="Jungle Marketing with an illustrated Polina Lazareva holding her camera.">
   <link rel="preload" href="assets/polina.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="edition.css?v=scenes-1">
-  <script src="edition.js?v=shot-1" defer></script>
+  <link rel="stylesheet" href="edition.css?v=camera-2">
+  <script src="edition.js?v=camera-2" defer></script>
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
@@ -39,10 +39,10 @@
           <h1 id="mast"><span class="mast-word">Jungle</span><span class="mast-script">Marketing</span></h1>
           <div class="portrait-stage">
             <img class="founder-model" src="assets/polina.webp" width="600" height="1450" alt="Illustrated portrait of Polina holding her camera." fetchpriority="high">
-            <canvas class="founder-action" width="384" height="928" aria-hidden="true"></canvas>
+            <video class="founder-action" width="512" height="1238" muted playsinline preload="none" disablepictureinpicture aria-hidden="true"></video>
           </div>
           <div class="cover-copy">
-            <p>Led by photographer and CEO <a href="https://www.instagram.com/polinalaz/">Polina Lazareva</a>, we make ads, content and websites for the people you want to reach.</p>
+            <p>Led by photographer and CEO Polina Lazareva, we make ads, content and websites for the people you want to reach.</p>
             <a class="button" href="#studio">See our work <span aria-hidden="true">↓</span></a>
           </div>
         </div>
@@ -67,9 +67,16 @@
           </div>
         </div>
         <div class="catalog">
-          <details open><summary>Paid social</summary><p>Reach people on Facebook, Instagram and VK. We plan campaigns around the action you need, from a first message to a sales enquiry.</p></details>
+          <details><summary>Paid social</summary><p>Reach people on Facebook and VK. We plan campaigns around the action you need, from a first message to a sales enquiry.</p></details>
           <details><summary>Social media management</summary><p>We plan posts, manage your accounts and shape the look of your profile so visitors can see what you offer.</p></details>
-          <details><summary>Content production</summary><p>Portraits, product photography and event coverage for websites, social feeds and advertising.</p></details>
+          <details open><summary>Content production</summary>
+            <div class="production-note">
+              <div><p>Portraits, product photography and event coverage for websites, social feeds and advertising.</p>
+                <a href="#studio">See the photo stories <span aria-hidden="true">↓</span></a>
+              </div>
+              <img class="print-scene" src="assets/polina-prints.webp" width="600" height="465" loading="lazy" decoding="async" alt="Polina selecting photographic prints.">
+            </div>
+          </details>
           <details><summary>Website design</summary><p>A one-page introduction or a multi-page website that helps visitors explore your offer and get in touch.</p></details>
           <details><summary>Analytics &amp; audits</summary><p id="audit-scope" tabindex="-1">We review your website, traffic and audience needs. That can include a Yandex Metrica review, product and persona maps, or a marketing kit.</p></details>
           <details><summary>Reels &amp; art direction</summary><p>Short-form video editing, reel covers and highlight artwork, with a visual direction for the whole profile.</p></details>
@@ -83,7 +90,6 @@
           <p class="micro cap">Selected B2C work</p>
           <h2 id="studio-title">Photo <em>stories.</em></h2>
           <p class="studio-deck">Five shoots from Polina Lazareva’s portfolio. Look closer at a piece of jewellery, an open notebook, a plate or a room.</p>
-          <img class="print-scene" src="assets/polina-prints.webp" width="600" height="465" loading="lazy" decoding="async" alt="Polina selecting photographic prints.">
         </div>
         <div class="casebook">
           <article class="case case-lead" aria-labelledby="case-jewellery">
