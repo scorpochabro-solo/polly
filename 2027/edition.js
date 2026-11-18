@@ -138,6 +138,15 @@ function setupCameraShot() {
   return sync;
 }
 
+// Lazy artwork must be decoded before its first entrance starts.
+for (const image of document.querySelectorAll(".catalog .service-scene")) {
+  if (image.complete) continue;
+  image.setAttribute("data-pending", "");
+  const ready = () => image.removeAttribute("data-pending");
+  image.addEventListener("load", () => image.decode().then(ready, ready), { once: true });
+  image.addEventListener("error", ready, { once: true });
+}
+
 document.querySelector(".catalog").addEventListener("toggle", (event) => {
   if (!event.target.open || !root.hasAttribute("data-moving") || !wave.animate) return;
   ripple?.cancel();
