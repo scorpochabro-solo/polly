@@ -1,13 +1,12 @@
 const root = document.documentElement;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-const finePointer = matchMedia("(hover: hover) and (pointer: fine)");
-const poster = document.querySelector(".poster");
 const portrait = document.querySelector(".portrait-stage");
 const toggle = document.querySelector(".motion");
 const wave = document.querySelector(".sound-wave");
 const audit = document.querySelector("#audit-scope");
 let paused = false;
 let ripple;
+const syncPortrait = setupCameraShot();
 
 function syncMotion() {
   const active = !paused && !reduced.matches;
@@ -16,12 +15,7 @@ function syncMotion() {
   if (!active) ripple?.cancel();
   toggle.hidden = reduced.matches;
   toggle.setAttribute("aria-pressed", String(active));
-  resetPointer();
-}
-
-function resetPointer() {
-  portrait.style.removeProperty("--px");
-  portrait.style.removeProperty("--py");
+  syncPortrait();
 }
 
 toggle.addEventListener("click", () => {
@@ -31,13 +25,119 @@ toggle.addEventListener("click", () => {
 reduced.addEventListener("change", syncMotion);
 syncMotion();
 
-poster.addEventListener("pointermove", (event) => {
-  if (!root.hasAttribute("data-moving") || !finePointer.matches) return;
-  const bounds = poster.getBoundingClientRect();
-  portrait.style.setProperty("--px", ((event.clientX - bounds.left) / bounds.width - .5) * 16 + "px");
-  portrait.style.setProperty("--py", ((event.clientY - bounds.top) / bounds.height - .5) * 10 + "px");
-}, { passive: true });
-poster.addEventListener("pointerleave", resetPointer);
+function setupCameraShot() {
+  const canvas = portrait.querySelector("canvas");
+  const brush = canvas?.getContext("2d");
+  const still = portrait.querySelector("img");
+  const trigger = document.querySelector(".take-photo");
+  if (!brush || !("IntersectionObserver" in window)) return () => {};
+
+  // Sixteen upper-body cels share the unchanged legs in the original portrait.
+  const cols = 4, width = 384, height = 448;
+  let atlas, loading, timer, raf, pending = false, onScreen = false;
+  let played = false, requested = false, failed = false, generation = 0;
+  const allowed = () => root.hasAttribute("data-moving") && !failed;
+  const visible = () => allowed() && onScreen && !document.hidden;
+  const settle = x => x * x * (3 - 2 * x);
+
+  function reset() {
+    ++generation;
+    clearTimeout(timer);
+    cancelAnimationFrame(raf);
+    portrait.removeAttribute("data-shooting");
+    trigger.removeAttribute("aria-disabled");
+    pending = false;
+  }
+
+  function glint(strength) {
+    // A single reflection on the lens, not a screen flash.
+    brush.save();
+    brush.translate(159,116);
+    brush.scale(strength,strength);
+    brush.fillStyle = "#fffbe0";
+    brush.beginPath();
+    for (const [x,y] of [[0,-9],[1.8,-2],[7,0],[1.8,1.6],[0,8],[-1.8,1.6],[-7,0],[-1.8,-2]]) brush.lineTo(x,y);
+    brush.closePath();
+    brush.fill();
+    brush.restore();
+  }
+
+  async function shoot() {
+    if (!visible() || pending) return;
+    clearTimeout(timer);
+    const run = ++generation;
+    pending = true;
+    trigger.setAttribute("aria-disabled","true");
+    if (!loading) {
+      atlas = new Image();
+      atlas.src = "assets/polina-shot.webp";
+      loading = Promise.all([atlas.decode(), still.decode()]);
+    }
+    try {
+      await loading;
+    } catch {
+      failed = true;
+      reset();
+      trigger.hidden = true;
+      return;
+    }
+    if (run !== generation || !visible()) return;
+    played = true;
+    brush.clearRect(0,0,canvas.width,canvas.height);
+    brush.drawImage(still,0,0,canvas.width,canvas.height);
+    let start, last = -1, lastSpark = -1;
+    function draw(now) {
+      start ??= now;
+      const ms = now - start;
+      if (ms >= 1800) { reset(); return; }
+      const lift = ms < 650 ? settle(ms/650) : ms < 1060 ? 1 : 1-settle((ms-1060)/740);
+      const cel = Math.round(lift * 16) - 1;
+      const spark = Math.max(0,1-Math.abs(ms-860)/82);
+      if (cel !== last || spark !== lastSpark) {
+        if (cel < 0) {
+          portrait.removeAttribute("data-shooting");
+        } else {
+          brush.clearRect(0,0,width,height);
+          brush.drawImage(atlas,(cel%cols)*width,Math.floor(cel/cols)*height,width,height,0,0,width,height);
+          if (spark > 0) glint(spark);
+          portrait.setAttribute("data-shooting","");
+        }
+        last = cel;
+        lastSpark = spark;
+      }
+      raf = requestAnimationFrame(draw);
+    }
+    raf = requestAnimationFrame(draw);
+  }
+
+  function sync() {
+    trigger.hidden = !allowed();
+    if (!allowed() || document.hidden) requested = false;
+    if (!visible()) { reset(); return; }
+    clearTimeout(timer);
+    if (requested) {
+      requested = false;
+      shoot();
+      return;
+    }
+    if (!played && !pending && !navigator.connection?.saveData) timer = setTimeout(shoot,550);
+  }
+  trigger.addEventListener("click",() => {
+    if (!allowed() || pending) return;
+    if (onScreen) shoot();
+    else {
+      requested = true;
+      portrait.scrollIntoView({block:"center",behavior:"instant"});
+    }
+  });
+  document.addEventListener("visibilitychange",sync);
+  const observer = new IntersectionObserver(([entry]) => {
+    onScreen = entry.isIntersecting && entry.intersectionRatio >= .3;
+    sync();
+  }, {threshold:[0,.3]});
+  observer.observe(portrait);
+  return sync;
+}
 
 document.querySelector(".catalog").addEventListener("toggle", (event) => {
   if (!event.target.open || !root.hasAttribute("data-moving") || !wave.animate) return;

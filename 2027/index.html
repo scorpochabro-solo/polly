@@ -18,8 +18,8 @@
   <link rel="preload" href="assets/barlow-condensed-bold.ttf" as="font" type="font/ttf" crossorigin>
   <meta property="og:image:alt" content="Jungle Marketing with an illustrated Polina Lazareva holding her camera.">
   <link rel="preload" href="assets/polina.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="edition.css">
-  <script src="edition.js" defer></script>
+  <link rel="stylesheet" href="edition.css?v=shot-1">
+  <script src="edition.js?v=shot-1" defer></script>
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
@@ -31,20 +31,26 @@
     </div>
   </header>
   <main id="main">
-    <!-- Masthead and independently moving mascot -->
+    <!-- The still portrait is the fallback when animation is unavailable. -->
     <section class="cover" aria-labelledby="mast">
       <div class="wrap cover-inner">
         <div class="poster">
           <div class="orbit" aria-hidden="true"></div>
           <h1 id="mast"><span class="mast-word">Jungle</span><span class="mast-script">Marketing</span></h1>
-          <div class="portrait-stage"><img class="founder-model" src="assets/polina.webp" width="600" height="1450" alt="Illustrated portrait of Polina holding her camera." fetchpriority="high"></div>
+          <div class="portrait-stage">
+            <img class="founder-model" src="assets/polina.webp" width="600" height="1450" alt="Illustrated portrait of Polina holding her camera." fetchpriority="high">
+            <canvas class="founder-action" width="384" height="928" aria-hidden="true"></canvas>
+          </div>
           <div class="cover-copy">
             <p>Led by photographer and CEO <a href="https://www.instagram.com/polinalaz/">Polina Lazareva</a>, we make ads, content and websites for the people you want to reach.</p>
             <a class="button" href="#studio">See our work <span aria-hidden="true">↓</span></a>
           </div>
         </div>
         <div class="cover-foot micro"><span>Working remotely, worldwide</span>
-          <button class="motion" hidden type="button" aria-pressed="true"><span class="switch" aria-hidden="true"></span> Motion</button>
+          <div class="cover-tools">
+            <button class="take-photo" type="button" hidden><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h4l2-3h6l2 3h4v13H3z"/><circle cx="12" cy="13" r="4"/></svg>Take a photo</button>
+            <button class="motion" hidden type="button" aria-pressed="true"><span class="switch" aria-hidden="true"></span> Motion</button>
+          </div>
         </div>
       </div>
     </section>
