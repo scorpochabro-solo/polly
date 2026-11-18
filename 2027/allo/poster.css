@@ -1,0 +1,131 @@
+@font-face {
+  font-family: Allo;
+  src: url("fonts/AlloVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: Allo;
+  src: url("fonts/Allo-BoldOblique.woff2") format("woff2");
+  font-weight: 700;
+  font-style: oblique;
+  font-display: swap;
+}
+
+:root {
+  --display: Allo, sans-serif;
+  --pine: #112a21;
+  --pollen: #edffad;
+  --cream: #fff7e5;
+  --apricot: #ffae80;
+  --paper: #f7f3e6;
+}
+body {
+  --headline-round: 100;
+  --headline-weight: 880;
+  font-family: var(--display);
+  font-weight: 430;
+  font-optical-sizing: auto;
+  font-variation-settings: "ROND" 38;
+  font-synthesis: none;
+}
+body:has(#cut-sharp:checked) { --headline-round: 0; --headline-weight: 620; }
+button, input, .steps li::before { font-family: var(--display); }
+.brand, .case-type { letter-spacing: -.025em; }
+:is(.mast-word, .service-art h2, .studio-head h2, .process-intro h2, .contact-head h2) {
+  font-family: var(--display); font-weight: var(--headline-weight);
+  font-variation-settings: "opsz" 32, "ROND" var(--headline-round);
+  font-feature-settings: "ss01";
+  text-transform: none;
+  letter-spacing: -.066em;
+  transition: font-variation-settings .28s ease-out, font-weight .28s ease-out;
+}
+.mast-script, h2 em {
+  font-family: var(--display); font-style: oblique; font-weight: 700;
+  font-variation-settings: normal; font-feature-settings: normal; letter-spacing: -.055em;
+}
+
+/* The aperture is a flat ink illustration; the animated photographer is a separate layer. */
+.header, .cover { color: var(--cream); background: var(--pine); }
+.cover { background: radial-gradient(ellipse at 82% 55%, #2e4930, transparent 59%), var(--pine); }
+.header-inner, .cover-foot { border-color: rgb(239 245 216 / 28%); }
+.claw { color: var(--pollen); }
+.header .button, .cover .button { background: var(--pollen); color: var(--pine); }
+.header .button span, .cover .button span { color: var(--pollen); background: var(--pine); }
+.button { border-radius: 5px 22px 5px 5px; }
+.button span { border-radius: 2px 14px 2px 2px; }
+.poster { padding-block: clamp(48px, 5.4vw, 94px) clamp(32px, 4vw, 66px); }
+.poster h1 { position: relative; z-index: 2; width: fit-content; }
+.poster .mast-word { font-size: 20.3cqw; line-height: .85; margin-left: -.035em; letter-spacing: -.03em; }
+.mast-script { margin: .19em 0 0 .04em; color: var(--pollen); font-size: 11.8cqw; line-height: 1; }
+.iris {
+  position: absolute; width: 42%; height: auto; right: 0; top: 49%;
+  transform: translateY(-50%) rotate(-13deg); color: #69422f; pointer-events: none;
+}
+.iris-disc { fill: var(--apricot); }
+.portrait-stage { width: 34%; inset: 6% 4% 5% auto; }
+.cover-copy { width: min(46%, 43ch); margin: clamp(20px, 2.8vw, 44px) 0 0; }
+.cover-copy p { color: #e2e8d9; line-height: 1.45; letter-spacing: -.012em; }
+.cover-foot { min-height: 70px; gap: 4px 16px; }
+.cover-foot > span { text-transform: none; font-size: .83rem; font-weight: 500; letter-spacing: .015em; }
+.cover-tools:not(:has(> :not([hidden]))) { display: none; }
+.type-cut { position: relative; display: flex; gap: 5px; align-items: center; min-width: 0; border: 0; margin: 0; padding: 0 0 0 6.4rem; }
+.type-cut legend { position: absolute; inset: 50% auto auto 0; transform: translateY(-50%); padding: 0; color: #c2cfbb; font-weight: 550; }
+.type-cut label { position: relative; display: grid; align-items: center; min-height: 44px; cursor: pointer; }
+.type-cut input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.type-cut label span {
+  padding: 4px 12px; border: 1px solid #728678; border-radius: 2px;
+  font-size: .85rem; text-transform: none; letter-spacing: 0; font-weight: 600;
+}
+.type-cut input:checked + span { background: var(--pollen); border-color: var(--pollen); color: var(--pine); }
+.type-cut input:focus-visible + span { outline: 2px solid var(--cream); outline-offset: 3px; }
+
+/* Change optical scale and rhythm with the subject, not the body copy. */
+.services { color: var(--pine); background: #e6eecc; }
+.services .cap, .service-note p { color: #3a5144; }
+.service-art em, .catalog details[open] summary, .catalog summary:focus-visible, .service-note a { color: #345d3e; }
+@media (hover: hover) { .catalog summary:hover { color: #345d3e; } }
+.echo-stage::before { background: radial-gradient(ellipse, #c4d6ab, transparent 66%); }
+.catalog { counter-reset: service; border-color: #718a70; }
+.catalog details { counter-increment: service; border-color: #9baa92; }
+.catalog summary { display: flex; align-items: baseline; gap: clamp(12px, 2cqw, 22px); font-weight: 650; letter-spacing: -.035em; }
+.catalog summary .index, .steps li::before { font-size: .83rem; letter-spacing: .02em; font-variant-numeric: tabular-nums; font-feature-settings: "ss03"; }
+.catalog summary .index { flex: none; color: #405e49; font-weight: 550; }
+.catalog summary .index::before { content: counter(service, decimal-leading-zero); }
+.service-art h2, .studio-head h2, .process-intro h2 { font-size: clamp(3.25rem, 6.9vw, 7.8rem); line-height: .94; }
+.studio-head h2 em { display: inline-block; color: #466545; }
+.case h3, .markets h3, .steps h3 { font-weight: 690; letter-spacing: -.045em; text-wrap: balance; }
+.case h3 { font-size: clamp(1.9rem, 3.2vw, 3.7rem); }
+.process { background: var(--pine); color: var(--cream); --rule: #516c5a; }
+.process-intro em { color: var(--pollen); }
+.steps li::before { color: var(--pollen); }
+.steps p { color: #d0daca; }
+.contact { background: var(--apricot); }
+.contact-head h2 { font-size: clamp(4.2rem, 10vw, 11rem); line-height: .96; }
+.viewer-count { font-feature-settings: "tnum", "ss03"; }
+
+@media (max-width: 760px) {
+  .cover-foot { flex-wrap: wrap; padding-block: 6px; }
+  .service-art h2, .process-intro h2 { font-size: clamp(3rem, 7.6vw, 4.5rem); }
+}
+@media (max-width: 580px) {
+  .header nav { border-color: #405849; }
+  .poster {
+    display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 18px 8px;
+    padding-block: 38px 30px; align-items: end;
+  }
+  .poster h1 { grid-column: 1/-1; min-height: 0; }
+  .poster .mast-word { font-size: 30.5cqw; }
+  .mast-script { font-size: 16.8cqw; }
+  .portrait-stage { position: relative; grid-area: 2/2; width: 100%; height: 62cqw; inset: auto; }
+  .iris { width: 55%; right: -3%; top: auto; bottom: 6%; transform: rotate(-13deg); }
+  .cover-copy { grid-area: 2/1; width: 100%; margin: 0; align-self: center; }
+  .cover-copy p { font-size: .98rem; }
+  .cover-copy .button { gap: 10px; padding-left: 12px; }
+  .cover-foot { display: grid; grid-template-columns: 1fr auto; gap: 0 6px; }
+  .type-cut { grid-row: 1; grid-column: 1/-1; }
+  .cover-tools { gap: 8px; }
+  .cover-foot > span { font-size: .73rem; }
+  .service-art h2, .process-intro h2, .studio-head h2 { font-size: clamp(2.8rem, 11.5vw, 4rem); }
+}
