@@ -97,19 +97,36 @@ nav a:hover, .footer-inner a:hover { text-decoration: underline; text-underline-
 .sound-wave::before, .sound-wave::after { content: ""; position: absolute; inset: 0 20%; border: 1px solid transparent; border-right-color: currentColor; border-radius: 50%; transform: rotate(-16deg); }
 .sound-wave::after { inset: -22% 0 -22% 18%; opacity: .55; }
 .services .cap { color: var(--muted); }
-.catalog { align-self: center; border-top: 1px solid #829382; }
+.catalog { align-self: center; min-width: 0; container-type: inline-size; border-top: 1px solid #829382; }
 .catalog details { border-bottom: 1px solid #617567; }
-summary { position: relative; padding: 19px 38px 19px 0; cursor: pointer; list-style: none; font-size: clamp(1.25rem, 2.2vw, 2.3rem); letter-spacing: -.05em; line-height: 1.2; transition: color .2s; }
-summary::-webkit-details-marker { display: none; }
-summary::before, summary::after { content: ""; position: absolute; height: 1.5px; width: 15px; right: 5px; top: 50%; background: currentColor; }
-summary::after { transform: rotate(90deg); transition: transform .2s; }
-details[open] summary, summary:hover { color: var(--lime); }
-details[open] summary::after { transform: rotate(0deg); }
-details p { max-width: 54ch; margin: -4px 22px 23px 0; color: var(--muted); font-size: .98rem; }
-.production-note { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.58fr); align-items: end; gap: clamp(12px,2vw,30px); padding: 2px 0 20px; }
-.production-note p { max-width: 36ch; margin: 0 0 10px; }
-.production-note a { display: inline-flex; gap: 9px; align-items: center; min-height: 44px; font-size: .88rem; font-weight: 700; color: var(--lime); text-decoration: underline; text-underline-offset: .25em; }
-.print-scene { width: min(100%,205px); height: auto; justify-self: end; }
+.catalog summary {
+  --preview: clamp(57px, 13cqw, 96px);
+  position: relative; display: grid; grid-template-columns: minmax(0,1fr) var(--preview); align-items: center;
+  gap: clamp(8px, 2.5cqw, 22px); min-height: calc(20px + var(--preview) * .83); padding: 8px clamp(30px, 6cqw, 48px) 8px 0;
+  cursor: pointer; list-style: none; font-size: clamp(1.25rem, 2.2vw, 2.3rem); letter-spacing: -.05em; line-height: 1.2; transition: color .2s;
+}
+.catalog summary::-webkit-details-marker { display: none; }
+.catalog summary::before, .catalog summary::after { content: ""; position: absolute; height: 1.5px; width: 15px; right: 5px; top: 50%; background: currentColor; }
+.catalog summary::after { transform: rotate(90deg); transition: transform .2s; }
+.catalog details[open] summary, .catalog summary:focus-visible { color: var(--lime); }
+.catalog details[open] summary::after { transform: none; }
+.service-preview { width: 100%; height: auto; aspect-ratio: 1.2; object-fit: contain; transition: transform .25s var(--ease); }
+.catalog details[open] .service-preview { visibility: hidden; }
+@media (hover: hover) and (pointer: fine) {
+  .catalog summary:hover { color: var(--lime); }
+  .catalog summary:hover .service-preview { transform: translateY(-2px) rotate(-3deg); }
+}
+.service-note {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.83fr); gap: clamp(12px, 4cqw, 32px);
+  align-items: center; padding: 0 clamp(8px, 2cqw, 20px) clamp(20px, 4cqw, 32px) 0;
+}
+.service-note p { max-width: 38ch; color: var(--muted); font-size: .98rem; }
+.service-note a { display: inline-flex; gap: 9px; align-items: center; min-height: 44px; margin-top: 8px; font-size: .88rem; font-weight: 700; color: var(--lime); text-decoration: underline; text-underline-offset: .25em; }
+.service-scene { width: min(100%, 250px); aspect-ratio: 1.2; height: auto; object-fit: contain; justify-self: end; }
+@container (max-width: 330px) {
+  .service-note { grid-template-columns: 1fr; gap: 10px; padding-right: 0; }
+  .service-scene { width: min(66%, 175px); justify-self: center; }
+}
 
 /* Portfolio and markets */
 .studio-head { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.48fr); grid-template-areas: "label ." "title deck"; align-items: end; gap: 22px clamp(22px,5vw,82px); }
