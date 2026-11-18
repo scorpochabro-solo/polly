@@ -100,9 +100,8 @@ nav a:hover, .footer-inner a:hover { text-decoration: underline; text-underline-
 .catalog { align-self: center; min-width: 0; container-type: inline-size; border-top: 1px solid #829382; }
 .catalog details { border-bottom: 1px solid #617567; }
 .catalog summary {
-  --preview: clamp(57px, 13cqw, 96px);
-  position: relative; display: grid; grid-template-columns: minmax(0,1fr) var(--preview); align-items: center;
-  gap: clamp(8px, 2.5cqw, 22px); min-height: calc(20px + var(--preview) * .83); padding: 8px clamp(30px, 6cqw, 48px) 8px 0;
+  position: relative; display: block; min-height: 48px;
+  padding: clamp(16px, 3cqw, 24px) 38px clamp(16px, 3cqw, 24px) 0;
   cursor: pointer; list-style: none; font-size: clamp(1.25rem, 2.2vw, 2.3rem); letter-spacing: -.05em; line-height: 1.2; transition: color .2s;
 }
 .catalog summary::-webkit-details-marker { display: none; }
@@ -110,11 +109,8 @@ nav a:hover, .footer-inner a:hover { text-decoration: underline; text-underline-
 .catalog summary::after { transform: rotate(90deg); transition: transform .2s; }
 .catalog details[open] summary, .catalog summary:focus-visible { color: var(--lime); }
 .catalog details[open] summary::after { transform: none; }
-.service-preview { width: 100%; height: auto; aspect-ratio: 1.2; object-fit: contain; transition: transform .25s var(--ease); }
-.catalog details[open] .service-preview { visibility: hidden; }
 @media (hover: hover) and (pointer: fine) {
   .catalog summary:hover { color: var(--lime); }
-  .catalog summary:hover .service-preview { transform: translateY(-2px) rotate(-3deg); }
 }
 .service-note {
   display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.83fr); gap: clamp(12px, 4cqw, 32px);
